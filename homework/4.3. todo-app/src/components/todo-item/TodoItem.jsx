@@ -3,8 +3,8 @@ import "./TodoItem.css";
 import Checkbox from "../checkbox/CheckBox";
 
 const TodoItem = (props) => {
-  const handleCheckboxChange = (value) => {
-    console.log(value);
+  const handleCheckboxChange = (event) => {
+    
   };
 
   return (
@@ -13,10 +13,10 @@ const TodoItem = (props) => {
         <div className="title-area">
           <Checkbox
             checked={!!props.completed}
-            onChange={handleCheckboxChange}
+            onChange={handleCheckboxChange}          
           />
 
-          <h4>Assignment 1</h4>
+          <h4>{props.title}</h4>
         </div>
         <div>
           <i className="fa fa-pencil" aria-hidden="true"></i>
@@ -27,8 +27,7 @@ const TodoItem = (props) => {
       <div className="separator"></div>
 
       <p>
-        Lorem ipsum dolor sit amet consectetur adipisicing elit. At id illo
-        repellendus non maiores in pariatur aliquam iure fugit amet!
+       {props.description}
       </p>
     </div>
   );

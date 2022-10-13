@@ -1,9 +1,10 @@
-import React from "react";
+import React, { useState } from "react";
 import Card from "./components/card/Card";
 import Input from "./components/input/Input";
 import TodoItem from "./components/todo-item/TodoItem";
 import TextArea from "./components/input/TextArea";
 import Button from "./components/button/Button";
+import Modal from "./components/modal/Modal";
 import "./App.css";
 
 const TODOS_MOCK = [
@@ -35,40 +36,115 @@ const TODOS_MOCK = [
 ];
 
 function App() {
+  const [ todoList, setTodoList ] = useState(TODOS_MOCK);
+  const [todoTitle, setTodoTitle] = useState("");
+  const [todoDescription, setTodoDescription ] = useState("");
+  const [isOpen, setIsOpen] = useState(false);
+  const [isCompleted, setIsCompleted] = useState(true);
+ 
+
+  const handleInputChange = (event) => {
+      setTodoTitle(event.target.value);
+  }  
+  const handleTextareaChange = (event) => {
+      setTodoDescription(event.target.value);
+  }
+
+
+
+
+
+  const resetForm = () => {
+    setTodoTitle("");
+    setTodoDescription("");
+  }
+
+
+  const handleSubmit = (event) => {
+      event.preventDefault();
+
+      const newTask = {
+        id: "1",
+        title: todoTitle,
+        description: todoDescription,
+        completed: false,
+      }
+
+      setTodoList((prevState) => [
+        ...prevState, 
+        {
+          ...newTask,
+          id: `${prevState.length + 1}`
+        }
+      ]);
+      resetForm();
+      closeModal();
+  }
+
+  const openModal = () => {
+    setIsOpen(true);
+  }
+
+  const closeModal = () => {
+    setIsOpen(false);
+  }
+
   return (
     <div className="App">
       <div className="app-container">
-        {/* 
-            This is your Create Card component.
-          */}
-        <Card>
-          <h2>Create Todo</h2>
-          <form>
-            <Input onChange={() => {}} placeholder="Title" type="text" />
-            <TextArea onChange={() => {}} placeholder="Description" />
-            <Button type="submit">Create</Button>
-          </form>
-        </Card>
-
         {/* 
           My Todos
         */}
         <Card>
           <h1>My todos</h1>
-          <Button onClick={() => console.log("Open Modal")}>Add +</Button>
+          <Button onClick={openModal}>Add +</Button>
           <div className="list-container">
-            <TodoItem completed={false} />
-            <TodoItem completed={false} />
+           
+            {
+              todoList
+              .filter((item) => item.completed === false )
+              .map((item) => (
+                <TodoItem 
+                key={item.id} 
+                id={item.id} 
+                title={item.title} 
+                description={item.description} 
+                completed={item.completed}
+                />
+              ))
+            }
+
           </div>
 
           <div className="separator"></div>
 
           <h2>Completed</h2>
           <div className="list-container">
-            <TodoItem completed={true} />
-            <TodoItem completed={true} />
+          {
+              todoList
+              .filter((item) => item.completed === true )
+              .map((item) => (
+                <TodoItem 
+                key={item.id} 
+                id={item.id} 
+                title={item.title} 
+                description={item.description} 
+                completed={item.completed} 
+                />
+              ))
+            }
           </div>
         </Card>
+        <Modal isOpen={isOpen} onClose={closeModal} >
+        <Card>
+          <h2>Create Todo</h2>
+          <form onSubmit={handleSubmit}>
+            <Input onChange={handleInputChange} placeholder="Title" type="text" value={todoTitle} />
+            <TextArea onChange={handleTextareaChange} placeholder="Description" value={todoDescription} > </TextArea>
+            <Button type="submit">Create</Button>
+          </form>
+        </Card>
+        </Modal>
       </div>
     </div>
   );
