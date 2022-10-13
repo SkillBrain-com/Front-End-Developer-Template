@@ -37,12 +37,23 @@ const TODOS_MOCK = [
 
 function App() {
   const [ todoList, setTodoList ] = useState(TODOS_MOCK);
+
   const [todoTitle, setTodoTitle] = useState("");
   const [todoDescription, setTodoDescription ] = useState("");
-  const [isOpen, setIsOpen] = useState(false);
-  const [isCompleted, setIsCompleted] = useState(true);
- 
+  const [todoId, setTodoId] = useState();
+  const [todoCompleted, setTodoCompleted]=useState();
 
+  const [isOpen, setIsOpen] = useState(false);
+
+  const [isChecked, setIsChecked] = useState(false);
+
+  const [findId, setFindId] = useState();
+
+  const [isEditMode, setIsEditMode] = useState(false);
+  
+
+
+ 
   const handleInputChange = (event) => {
       setTodoTitle(event.target.value);
   }  
@@ -50,7 +61,15 @@ function App() {
       setTodoDescription(event.target.value);
   }
 
+  const changeTheList = (id) => {
+    removeItem(id);
+    moveItem(id);
+  }
 
+  const moveTodo = (todoList) => {
+   
+console.log("findId as in App:", findId);
+  }
 
 
 
@@ -62,12 +81,19 @@ function App() {
 
   const handleSubmit = (event) => {
       event.preventDefault();
+     
+     //trying to fix completed-edit-is-put-in-todo bug, not successful
+      console.log("Edit mode:", isEditMode);
+      let decidedIfChecked = false;
+      if((isChecked === true)&&(isEditMode === true)){
+        decidedIfChecked = true;
+      }
 
       const newTask = {
         id: "1",
         title: todoTitle,
         description: todoDescription,
-        completed: false,
+        completed: decidedIfChecked,
       }
 
       setTodoList((prevState) => [
@@ -79,6 +105,10 @@ function App() {
       ]);
       resetForm();
       closeModal();
+      if(isEditMode === true) {
+        setIsEditMode(false);
+        console.log("Edit mode:", isEditMode);
+      }
   }
 
   const openModal = () => {
@@ -87,6 +117,66 @@ function App() {
 
   const closeModal = () => {
     setIsOpen(false);
+  }
+
+  const removeItem = (removableId) => {
+    console.log("id to b removed as in App: ", removableId);
+     const shorterList = todoList
+    .filter((item) => item.id !== removableId);
+    console.log(shorterList);
+    setTodoList(shorterList);
+  }
+
+  const moveItem = (movableId) => {
+    console.log("id to b moved as in App: ", movableId);
+    const changedList = todoList
+    .filter((item) => item.id === movableId);
+
+    switch(changedList[0].completed ){
+      case false:
+        changedList[0].completed = true;
+        setIsChecked(true);
+        break;
+      case true:
+        changedList[0].completed = false;
+        setIsChecked(false);
+        break;
+    }
+
+    const itemToMove = {
+      key: movableId,
+      id: movableId,
+      title: changedList[0].title,
+      description: changedList[0].description,
+      completed: changedList[0].completed,
+    }
+
+    console.log(itemToMove);
+
+     setTodoList((prevState) => [
+      ...prevState, 
+      {
+        ...itemToMove
+      }
+    ]);
+  }
+
+  const editItem = (editableId) => {
+    console.log(editableId);
+    setIsEditMode(true);
+
+    setIsOpen(true);
+   // event.preventDefault();
+
+   const selectItem = todoList
+   .filter((item) => item.id === editableId);
+   
+    //remove when not edited deletes the post
+   removeItem(editableId);
+   
+   setTodoTitle(selectItem[0].title);
+   setTodoDescription(selectItem[0].description);
+ 
   }
 
   return (
@@ -99,8 +189,7 @@ function App() {
           <h1>My todos</h1>
           <Button onClick={openModal}>Add +</Button>
           <div className="list-container">
-           
-            {
+            { 
               todoList
               .filter((item) => item.completed === false )
               .map((item) => (
@@ -110,8 +199,12 @@ function App() {
                 title={item.title} 
                 description={item.description} 
                 completed={item.completed}
+                isChecked={changeTheList}
+                isRemoved={removeItem}
+                isEdited={editItem}
                 />
               ))
+              
             }
 
           </div>
@@ -130,6 +223,9 @@ function App() {
                 title={item.title} 
                 description={item.description} 
                 completed={item.completed} 
+                isChecked={changeTheList}
+                isRemoved={removeItem}
+                isEdited={editItem}
                 />
               ))
             }

@@ -7,7 +7,7 @@ const Checkbox = (props) => {
 
   const handleCheckboxChange = (e) => {
     setChecked(e.target.checked);
-   // props.isChanged(e.target.checked);
+    props.isChecked(e.target.id);
     ;
   };
 
@@ -24,6 +24,7 @@ const Checkbox = (props) => {
         checked={checked}
         onChange={handleCheckboxChange}
         type="checkbox"
+        id={props.id}
       />
       <label
         className={`checkbox ${checked ? "checkbox--active" : ""}`}
