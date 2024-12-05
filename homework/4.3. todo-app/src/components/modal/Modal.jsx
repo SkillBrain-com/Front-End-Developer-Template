@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import "./Modal.css";
 import { useEffect } from "react";
-
+import Card from "../card/Card";
 const Modal = (props) => {
   const [isOpen, setIsOpen] = useState(false);
 
@@ -24,7 +24,9 @@ const Modal = (props) => {
         className="close-icon fa fa-times-circle-o"
         aria-hidden="true"
       ></i>
-
+<Card>
+  
+</Card>
       <div className="modal-content">{props.children}</div>
     </div>
   );

@@ -1,9 +1,10 @@
-import React from "react";
+import React, { useState } from "react";
 import Card from "./components/card/Card";
 import Input from "./components/input/Input";
 import TodoItem from "./components/todo-item/TodoItem";
 import TextArea from "./components/input/TextArea";
 import Button from "./components/button/Button";
+import Modal from "./components/modal/Modal";
 import "./App.css";
 
 const TODOS_MOCK = [
@@ -35,38 +36,104 @@ const TODOS_MOCK = [
 ];
 
 function App() {
+  const [todos, setTodos] = useState(TODOS_MOCK);
+  const [newTodo, setNewTodo] = useState({ title: "", description: "", completed: false });
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setNewTodo({
+      ...newTodo,
+      [name]: value,
+    });
+  };
+
+  const handleCreateTodo = (e) => {
+    e.preventDefault();
+    const updatedTodos = [...todos, { ...newTodo, id: Date.now().toString() }];
+    setTodos(updatedTodos);
+    setNewTodo({ title: "", description: "", completed: false });
+  };
+
+  const handleToggleCompleted = (id, completed) => {
+    const updatedTodos = todos.map(todo =>
+      todo.id === id ? { ...todo, completed } : todo
+    );
+    setTodos(updatedTodos);
+  };
+
+  const handleDeleteTodo = (id) => {
+    const updatedTodos = todos.filter(todo => todo.id !== id);
+    setTodos(updatedTodos);
+  };
+  const handleUpdateTodo = (id, title, description) => {
+    const updatedTodos = todos.map(todo =>
+      todo.id === id ? { ...todo, title, description } : todo
+    );
+    setTodos(updatedTodos);
+  };
+  const [open, setOpen] = useState(false);
+  const handleClose = () => { setOpen(false); };
+  const handleOpen = () => {
+    setOpen(true);
+  };
+
   return (
     <div className="App">
       <div className="app-container">
-        {/* 
-            This is your Create Card component.
-          */}
         <Card>
           <h2>Create Todo</h2>
-          <form>
-            <Input onChange={() => {}} placeholder="Title" type="text" />
-            <TextArea onChange={() => {}} placeholder="Description" />
-            <Button type="submit">Create</Button>
+          <form onSubmit={handleCreateTodo}>
+            <Input
+              name="title"
+              value={newTodo.title}
+              onChange={handleInputChange}
+              placeholder="Title"
+              type="text"
+            />
+            <TextArea
+              name="description"
+              value={newTodo.description}
+              onChange={handleInputChange}
+              placeholder="Description"
+            />
+            <Button disabled={!newTodo.title + !newTodo.description} type="submit">Create</Button>
           </form>
         </Card>
 
-        {/* 
-          My Todos
-        */}
         <Card>
           <h1>My todos</h1>
-          <Button onClick={() => console.log("Open Modal")}>Add +</Button>
+          <Modal isOpen={open} onClose={handleClose}>
+          </Modal>
+          < Button onClick={handleOpen}>Add +</Button>
           <div className="list-container">
-            <TodoItem completed={false} />
-            <TodoItem completed={false} />
+            {todos.filter(todo => !todo.completed).map(todo => (
+              <TodoItem
+                key={todo.id}
+                id={todo.id}
+                completed={todo.completed}
+                title={todo.title}
+                description={todo.description}
+                onToggleCompleted={handleToggleCompleted}
+                onDelete={handleDeleteTodo}
+                onUpdate={handleUpdateTodo}
+              />
+            ))}
           </div>
-
           <div className="separator"></div>
-
           <h2>Completed</h2>
           <div className="list-container">
-            <TodoItem completed={true} />
-            <TodoItem completed={true} />
+            {todos.filter(todo => todo.completed).map(todo => (
+              <TodoItem
+                key={todo.id}
+                id={todo.id}
+                completed={todo.completed}
+                title={todo.title}
+                description={todo.description}
+                onToggleCompleted={handleToggleCompleted}
+                onDelete={handleDeleteTodo}
+                onUpdate={handleUpdateTodo}
+              />
+            ))}
           </div>
         </Card>
       </div>
