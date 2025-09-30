@@ -1,0 +1,12 @@
+.task-viewer {
+  background-color: #f3f3fb;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 40px;
+  border-radius: 50px;
+  padding: 40px;
+  width: 100%;
+  min-height: 80vh;
+  margin: 20px auto;
+  opacity: 1;
+}
